@@ -33,6 +33,9 @@
     <ClInclude Include="TreeView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="HIDScoutTemplateSelector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HIDScout.cpp">
@@ -45,6 +48,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TreeView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HIDScoutTemplateSelector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Generated Files\module.g.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -66,5 +75,10 @@
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="HIDScout.exe.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="HIDScoutTemplateSelector.idl">
+      <Filter>Source Files</Filter>
+    </Midl>
   </ItemGroup>
 </Project>

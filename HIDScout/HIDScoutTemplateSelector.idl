@@ -1,0 +1,8 @@
+namespace HIDScout
+{
+    runtimeclass HIDScoutTemplateSelector : Windows.UI.Xaml.Controls.DataTemplateSelector
+    {
+        HIDScoutTemplateSelector();
+        String blah;
+    }
+}

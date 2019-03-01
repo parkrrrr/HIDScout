@@ -7,15 +7,13 @@ class MainWindow;
 class Application
 {
 public:
-	Application(HINSTANCE hInstance);
-	static std::shared_ptr<MainWindow> GetMainWindow()
-	{
-		return s_mainWindow;
-	}
+    Application(HINSTANCE hInstance);
+    static HINSTANCE GetInstance()
+    {
+        return s_hInstance;
+    }
 
-	void Init();
-	int Run();
+    int Run();
 private:
-	HINSTANCE m_hInstance;
-	static std::shared_ptr<MainWindow> s_mainWindow;
+    static HINSTANCE s_hInstance;
 };
