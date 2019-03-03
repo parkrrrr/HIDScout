@@ -74,6 +74,32 @@ VID e6f  PID 501
                Value  10030
 ~~~~
 
+This device uses well-known usage pages and usages, as you'd expect from a device that's a figment of the Windows 
+XBox Controller driver's imagination. If you want to follow along at home, all of these values are defined in the
+[USB HID Usage Tables](https://www.usb.org/sites/default/files/documents/hut1_12v2.pdf) document.
+
+*HIDReport* reports all usages as a 32-bit number. The high word is the usage page, and the low word is the usage
+within that page.
+
+This device has one Input report. That report's top-level usage is 00010005, which is on the Generic Desktop Page (0001)
+and represents a Game Pad (0005). It contains 10 buttons, one non-button control, and three additional collections of
+controls.
+
+The ten buttons are on the Buttons page, and have the imaginitive names "Button 1" through "Button 10." The value is
+on the Generic Desktop page, again, and represents a hat switch. (This is the d-pad on the left side of the controller.)
+This is consistent with the controller, which has ten buttons in various places.
+
+The first subcollection has an undefined usage, and contains one control representing the Z axis. I'm not entirely sure
+what this control is. 
+
+The second subcollection also has an undefined usage, and contains two controls representing the rX and rY axes. These 
+are technically supposed to be rotational axes, but since there are two joysticks on the device, I guess they decided to
+tag one as rotational whether or not that made sense.
+
+The third subcollection, shockingly, also has an undefined usage, and contains two controls representing the X and Y axes.
+This is the other joystick. Which is which is not apparent from this information, but could be determined once my tools
+include the current values of input controls.
+
 ## Troubleshooting
 
 If you have an attached device that you'd expect to see in the listing, you may find that you have to stop 
