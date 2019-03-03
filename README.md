@@ -12,7 +12,7 @@ to look at the data reported by any HID class device, subject to operating syste
 
 ## Features
 
-Currently, HIDScout itself is not yet doing anything useful. It's a Win32 app with a XAML UI, taking advantage 
+Currently, *HIDScout* itself is not yet doing anything useful. It's a Win32 app with a XAML UI, taking advantage 
 of the new [XAML Islands](https://docs.microsoft.com/en-us/windows/uwp/xaml-platform/xaml-host-controls) feature 
 in the [Windows 10 October 2018 Update](https://support.microsoft.com/gl-es/help/4028685/windows-10-get-the-update), 
 and I'm still learning my way around that particular frontier. However, all is not lost. If you need to see some 
@@ -35,6 +35,43 @@ usages, plus an interface to the [Linux USB ID Repository](http://www.linux-usb.
 *HIDReportTest* is just what it says - an application to test the functionality of *HIDReport*. However, it's
 also a completely functional application. When you run it from a command prompt, it will dump the entire HID
 report tree for every attached device it can open.
+
+Here's an example of the output. This device is a knockoff XBox360 controller made by "@Play." (But the vendor ID
+belongs to Logic3, and the manufacturer chose to not provide a name for themselves in the USB descriptor. Normally,
+that manufacturer name would precede the :: on the second line.)
+`
+VID e6f  PID 501
+    :: Controller (Wired Controller for Xbox 360)
+      Input Max Report ID 0
+         Report 0
+            Usage 10005
+            10 buttons 1 values 3 subcollections
+            Button 90001
+            Button 90002
+            Button 90003
+            Button 90004
+            Button 90005
+            Button 90006
+            Button 90007
+            Button 90008
+            Button 90009
+            Button 9000a
+            Value  10039
+            ----------------------------------
+               Usage 10000
+               1 values
+               Value  10032
+            ----------------------------------
+               Usage 10000
+               2 values
+               Value  10034
+               Value  10033
+            ----------------------------------
+               Usage 10000
+               2 values
+               Value  10031
+               Value  10030
+`
 
 ## Troubleshooting
 
