@@ -39,8 +39,10 @@ report tree for every attached device it can open.
 Here's an example of the output. This device is a knockoff XBox360 controller made by "@Play." (But the vendor ID
 belongs to Logic3, and the manufacturer chose to not provide a name for themselves in the USB descriptor. Normally,
 that manufacturer name would precede the :: on the second line.)
+
 `
 VID e6f  PID 501
+
     :: Controller (Wired Controller for Xbox 360)
 	
       Input Max Report ID 0
