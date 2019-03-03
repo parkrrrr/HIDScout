@@ -80,7 +80,10 @@ XBox Controller driver's imagination. If you want to follow along at home, all o
 [USB HID Usage Tables](https://www.usb.org/sites/default/files/documents/hut1_12v2.pdf) document.
 
 *HIDReport* reports all usages as a 32-bit number. The high word is the usage page, and the low word is the usage
-within that page.
+within that page. Anything in the below description that maps a control in the HID report to a control on the controller
+was discovered using the Controller Properties dialog in Windows 10:
+
+![Screenshot of the Controller Properties dialog](Controller.png "Screenshot of the Controller Properties dialog)
 
 This device has one Input report. That report's top-level usage is 00010005, which is on the Generic Desktop Page (0001)
 and represents a Game Pad (0005). It contains 10 buttons, one non-button control, and three additional collections of
@@ -88,19 +91,18 @@ controls.
 
 The ten buttons are on the Buttons page, and have the imaginative names "Button 1" through "Button 10." The value is
 on the Generic Desktop page, again, and represents a hat switch. (This is the d-pad on the left side of the controller.)
-This is consistent with the controller, which has ten buttons in various places.
+This is consistent with the controller, which has ten buttons in various places. In order, those buttons are A, B, X, Y,
+L, R, Back, Start, Left Stick, Right Stick.
 
-The first subcollection has an undefined usage, and contains one control representing the Z axis. I'm not entirely sure
-what this control is. 
+The first subcollection has an undefined usage, and contains one control representing the Z axis. That value represents 
+a combination of the two triggers. The formula appears to be something like 0 + left trigger - right trigger.
 
 The second subcollection also has an undefined usage, and contains two controls representing the rX and rY axes. These 
 are technically supposed to be rotational axes, but since there are two joysticks on the device, I guess they decided to
-tag one as rotational whether or not that made sense. (The right way to do this, if you're doing something similar yourself, 
-is in Section A.5 of the USB Usage Tables document linked above.)
+tag one as rotational whether or not that made sense. This is the right stick.
 
 The third subcollection, shockingly, also has an undefined usage, and contains two controls representing the X and Y axes.
-This is the other joystick. Which is which is not apparent from this information, but could be determined once my tools
-include the current values of input controls.
+This is the left stick.
 
 ## Troubleshooting
 
