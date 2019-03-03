@@ -36,9 +36,10 @@ usages, plus an interface to the [Linux USB ID Repository](http://www.linux-usb.
 also a completely functional application. When you run it from a command prompt, it will dump the entire HID
 report tree for every attached device it can open.
 
-Here's an example of the output. This device is a knockoff XBox360 controller made by "@Play." (But the vendor ID
-belongs to Logic3, and the manufacturer chose to not provide a name for themselves in the USB descriptor. Normally,
-that manufacturer name would precede the :: on the second line.)
+Here's an example of the output. This device is a knockoff XBox360 controller made by "@Play," which is apparently
+a Gamestop house brand. (But the USB vendor ID belongs to Logic3, whoever that is/was, and the manufacturer chose 
+to not provide a name for themselves in the USB descriptor. Normally, that manufacturer name would precede the :: 
+on the second line.)
 
 ~~~~
 VID e6f  PID 501
