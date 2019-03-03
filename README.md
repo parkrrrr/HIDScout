@@ -86,7 +86,7 @@ This device has one Input report. That report's top-level usage is 00010005, whi
 and represents a Game Pad (0005). It contains 10 buttons, one non-button control, and three additional collections of
 controls.
 
-The ten buttons are on the Buttons page, and have the imaginitive names "Button 1" through "Button 10." The value is
+The ten buttons are on the Buttons page, and have the imaginative names "Button 1" through "Button 10." The value is
 on the Generic Desktop page, again, and represents a hat switch. (This is the d-pad on the left side of the controller.)
 This is consistent with the controller, which has ten buttons in various places.
 
