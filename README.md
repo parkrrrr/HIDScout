@@ -95,7 +95,8 @@ what this control is.
 
 The second subcollection also has an undefined usage, and contains two controls representing the rX and rY axes. These 
 are technically supposed to be rotational axes, but since there are two joysticks on the device, I guess they decided to
-tag one as rotational whether or not that made sense.
+tag one as rotational whether or not that made sense. (The right way to do this, if you're doing something similar yourself, 
+is in Section A.5 of the USB Usage Tables document linked above.)
 
 The third subcollection, shockingly, also has an undefined usage, and contains two controls representing the X and Y axes.
 This is the other joystick. Which is which is not apparent from this information, but could be determined once my tools
