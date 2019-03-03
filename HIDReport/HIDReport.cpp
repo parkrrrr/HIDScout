@@ -160,7 +160,7 @@ namespace
         int GetReportCount(int type)
         {
             Init();
-            if (type >= 0 && type < 2)
+            if (type >= 0 && type <= 2)
             {
                 return m_reportCount[type];
             }
@@ -207,7 +207,85 @@ namespace
                 HidD_GetProductString(m_hidDeviceObject, tempString, sizeof(tempString));
                 m_product = tempString;
 
+                ParseReportInformation();
+
                 m_isInitialized = true;
+            }
+        }
+
+        void ParseReportInformation()
+        {
+            // Get the top-level capabilities for the device
+            HidP_GetCaps(m_preparsedData.Get(), &m_topLevelCaps);
+            
+            // Get all of the collections and initialize their types to 'unused'
+            unsigned long length = m_topLevelCaps.NumberLinkCollectionNodes;
+            m_collectionNodes = std::make_unique<HIDP_LINK_COLLECTION_NODE[]>(length);
+            HidP_GetLinkCollectionNodes(m_collectionNodes.get(), &length, m_preparsedData.Get());
+
+            m_collectionTypes.insert(m_collectionTypes.cbegin(), length, 0);
+
+            // Get the button capabilities for all of the report types
+            GetButtonCaps(HidP_Input, m_topLevelCaps.NumberInputButtonCaps);
+            GetButtonCaps(HidP_Output, m_topLevelCaps.NumberOutputButtonCaps);
+            GetButtonCaps(HidP_Feature, m_topLevelCaps.NumberFeatureButtonCaps);
+
+            // Get the value capabilities for all of the report types
+            GetValueCaps(HidP_Input, m_topLevelCaps.NumberInputValueCaps);
+            GetValueCaps(HidP_Output, m_topLevelCaps.NumberOutputValueCaps);
+            GetValueCaps(HidP_Feature, m_topLevelCaps.NumberFeatureValueCaps);
+
+            for (int i = 0; i < 3; ++i)
+            {
+                if (m_reportCount[i] == 0 && !(m_collectionTypes[0] & (1 << i)))
+                {
+                    m_reportCount[i] = -1;
+                }
+            }
+        }
+
+        void UpdateLinkCollectionTypes(unsigned short collectionID, HIDP_REPORT_TYPE type)
+        {
+            int flag = 1 << type;
+
+            do
+            {
+                m_collectionTypes[collectionID] |= flag;
+                collectionID = m_collectionNodes[collectionID].Parent;
+            } while (collectionID);
+        }
+
+        void GetButtonCaps(HIDP_REPORT_TYPE type, unsigned short count)
+        {
+            if (!count) return;
+            m_buttonCaps[type] = std::make_unique<HIDP_BUTTON_CAPS[]>(count);
+            HidP_GetButtonCaps(type, m_buttonCaps[type].get(), &count, m_preparsedData.Get());
+
+            for (size_t i = 0; i < count; ++i)
+            {
+                auto& buttonCap{ m_buttonCaps[type][i] };
+                if (buttonCap.ReportID > m_reportCount[type])
+                {
+                    m_reportCount[type] = buttonCap.ReportID;
+                }
+                UpdateLinkCollectionTypes(buttonCap.LinkCollection, type);
+            }
+        }
+
+        void GetValueCaps(HIDP_REPORT_TYPE type, unsigned short count)
+        {
+            if (!count) return;
+            m_valueCaps[type] = std::make_unique<HIDP_VALUE_CAPS[]>(count);
+            HidP_GetValueCaps(type, m_valueCaps[type].get(), &count, m_preparsedData.Get());
+
+            for (size_t i = 0; i < count; ++i)
+            {
+                auto& valueCap{ m_valueCaps[type][i] };
+                if (valueCap.ReportID > m_reportCount[type])
+                {
+                    m_reportCount[type] = valueCap.ReportID;
+                }
+                UpdateLinkCollectionTypes(valueCap.LinkCollection, type);
             }
         }
 
@@ -231,6 +309,16 @@ namespace
 
         FileHandle m_hidDeviceObject;
         PreparsedData m_preparsedData;
+
+        HIDP_CAPS m_topLevelCaps = {};
+        std::unique_ptr<HIDP_LINK_COLLECTION_NODE[]> m_collectionNodes;
+        std::unique_ptr<HIDP_BUTTON_CAPS[]> m_buttonCaps[3];
+        std::unique_ptr<HIDP_VALUE_CAPS[]> m_valueCaps[3];
+
+        const int COL_INPUT = 1 << HidP_Input;
+        const int COL_OUTPUT = 1 << HidP_Output;
+        const int COL_FEATURE = 1 << HidP_Feature;
+        std::vector<int> m_collectionTypes;
 
     };
 
@@ -270,7 +358,7 @@ namespace
 
         int GetCount()
         {
-            return m_handles.size();
+            return static_cast<int>(m_handles.size());
         }
 
         int GetHandle(int index)
@@ -316,11 +404,11 @@ namespace
         if (string)
         {
             wcscpy_s(string, stringSize, cppString.c_str());
-            return wcslen(string) + 1;
+            return static_cast<int>(wcslen(string) + 1);
         }
         else
         {
-            return cppString.length() + 1;
+            return static_cast<int>(cppString.length() + 1);
         }
     }
 }

@@ -54,14 +54,16 @@ extern "C"
     // Get the number of supported reports of a given type
     // handle = the handle from Devices_OpenDevice
     // type = input=0, output=1, feature=2
-    // Returns the number of reports
+    // Returns the number of reports, sort of.
+    // If there is exactly one report, but report IDs are not used for this type, this method returns 0.
+    // If there are no reports of this type, this method returns -1.
     int HID_IMPORT_EXPORT Device_ReportCount(int handle, int type);
 
     // Open the specified report
     // handle = the handle from Devices_OpenDevice
     // type = input=0, output=1, feature=2
     // id = 
-    //       0 if Device_ReportCount is 1
+    //       0 if Device_ReportCount is 0
     //       1 <= id <= ReportCount otherwise
     // Returns a handle to the opened report's top-level collection
     int HID_IMPORT_EXPORT Device_OpenReportCollection(int handle, int type, int id);

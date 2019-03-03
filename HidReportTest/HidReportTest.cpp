@@ -9,6 +9,24 @@ namespace HID
 #include "..\HIDReport\HIDReport.h"
 }
 
+std::string Indent(size_t level)
+{
+    return std::string(level * 3, ' ');
+}
+
+void DumpReport(int device, int type)
+{
+    const char* typeNames[] = { "Input", "Output", "Feature" };
+
+    auto count = HID::Device_ReportCount(device, type);
+    if (count < 0)
+    {
+        return;
+    }
+
+    std::cout << Indent(2).c_str() << typeNames[type] << " Report count " << count << "\n";
+}
+
 int main()
 {
     int devices = HID::Devices_Open();
@@ -40,8 +58,15 @@ int main()
                     auto sproduct = std::make_unique<char[]>(psize);
                     wcstombs_s(nullptr, sproduct.get(), psize, product.get(), psize);
 
-                    std::cout << "VID " << std::hex << vid << "  PID " << pid << "\n" <<
-                        "   " << smfgr << " :: " << sproduct << "\n\n";
+                    std::cout << "VID " << std::hex << vid << "  PID " << pid << std::dec << "\n" <<
+                        "   " << smfgr << " :: " << sproduct << "\n";
+
+                    for (int i = 0; i < 3; ++i)
+                    {
+                        DumpReport(device, i);
+                    }
+
+                    std::cout << "\n";
 
                     HID::Device_Close(device);
                 }
@@ -50,14 +75,3 @@ int main()
         }
     }
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
