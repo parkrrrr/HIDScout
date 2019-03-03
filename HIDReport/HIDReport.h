@@ -44,6 +44,13 @@ extern "C"
     // handle = the handle from Devices_OpenDevice
     void HID_IMPORT_EXPORT Device_Close(int handle);
 
+    // Determine whether the device was successfully opened
+    // handle = the handle from Devices_OpenDevice
+    // Returns 1 if the device was successfully opened, 0 otherwise
+    // A device cannot be opened if another application has opened it for exclusive access.
+    // For example, my Wacom Intuos S tablet can only be opened if I stop the Wacom driver service first.
+    int HID_IMPORT_EXPORT Device_Opened(int handle);
+
     // Get the number of supported reports of a given type
     // handle = the handle from Devices_OpenDevice
     // type = input=0, output=1, feature=2
@@ -59,14 +66,23 @@ extern "C"
     // Returns a handle to the opened report's top-level collection
     int HID_IMPORT_EXPORT Device_OpenReportCollection(int handle, int type, int id);
 
-    // Get the name of the device
+    // Get the manufacturer name of the device
     // handle = the handle from Devices_OpenDevice
     // name = a caller-allocated buffer
     // nameSize = the size of name in characters (WORDs)
     // Returns
     //        the necessary size in characters if name is nullptr, including the null temrinator
     //        the number of characters written otherwise, including the null terminator
-    int HID_IMPORT_EXPORT Device_Name(int handle, wchar_t* name, int nameSize);
+    int HID_IMPORT_EXPORT Device_Manufacturer(int handle, wchar_t* name, int nameSize);
+
+    // Get the product name of the device
+    // handle = the handle from Devices_OpenDevice
+    // name = a caller-allocated buffer
+    // nameSize = the size of name in characters (WORDs)
+    // Returns
+    //        the necessary size in characters if name is nullptr, including the null temrinator
+    //        the number of characters written otherwise, including the null terminator
+    int HID_IMPORT_EXPORT Device_Product(int handle, wchar_t* name, int nameSize);
 
     // Get the VID (vendor ID) of the device
     // handle = the handle from Devices_OpenDevice

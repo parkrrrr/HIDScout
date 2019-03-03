@@ -1,5 +1,11 @@
 #include "stdafx.h"
 
+#include <hidsdi.h>
+#include <hidpi.h>
+#include <SetupAPI.h>
+#include <initguid.h>
+#include <usbiodef.h>
+
 #define HID_IMPORT_EXPORT _declspec(dllexport) _stdcall 
 #include "HIDReport.h"
 
@@ -10,58 +16,390 @@
 #define HID_IMPORT_EXPORT _declspec(dllimport) _stdcall 
 #endif
 
+namespace
+{
+    class HandleFactory
+    {
+    public:
+        static int GetNextHandle()
+        {
+            return ++lastHandle;
+        }
+    private:
+        static int lastHandle;
+    };
+
+    int HandleFactory::lastHandle = 0;
+
+    class FileHandle
+    {
+    public:
+        FileHandle() : m_handle(INVALID_HANDLE_VALUE)
+        {
+        }
+
+        FileHandle(HANDLE handle) : m_handle(handle)
+        {
+        }
+
+        FileHandle(FileHandle&) = delete;
+        FileHandle(FileHandle&& a)
+        {
+            m_handle = a.m_handle;
+            a.m_handle = INVALID_HANDLE_VALUE;
+        }
+
+        FileHandle& operator =(HANDLE handle)
+        {
+            if (m_handle != INVALID_HANDLE_VALUE)
+            {
+                CloseHandle(m_handle);
+            }
+
+            m_handle = handle;
+            return *this;
+        }
+
+        operator bool()
+        {
+            return (m_handle != INVALID_HANDLE_VALUE);
+        }
+
+        operator HANDLE()
+        {
+            return m_handle;
+        }
+
+        ~FileHandle()
+        {
+            if (m_handle != INVALID_HANDLE_VALUE)
+            {
+                CloseHandle(m_handle);
+            }
+        }
+
+    private:
+        HANDLE m_handle = INVALID_HANDLE_VALUE;
+    };
+
+    class PreparsedData
+    {
+    public:
+        void Open(HANDLE deviceObject)
+        {
+            HidD_GetPreparsedData(deviceObject, &preparsedData);
+        }
+
+        PreparsedData() {}
+
+        PreparsedData(PreparsedData&) = delete;
+
+        PreparsedData(PreparsedData&& a)
+        {
+            preparsedData = a.preparsedData;
+            a.preparsedData = nullptr;
+        }
+
+        ~PreparsedData()
+        {
+            if (preparsedData)
+            {
+                HidD_FreePreparsedData(preparsedData);
+            }
+        }
+
+        operator bool()
+        {
+            return (preparsedData != nullptr);
+        }
+
+        PHIDP_PREPARSED_DATA Get()
+        {
+            return preparsedData;
+        }
+
+    private:
+        PHIDP_PREPARSED_DATA preparsedData = nullptr;
+    };
+
+    class Device
+    {
+    public:
+        Device(const WCHAR* deviceName) : m_deviceName(deviceName)
+        {
+        }
+
+        ~Device() = default;
+
+        Device(Device&) = delete;
+        Device(Device&& a) = default;
+
+        void Close()
+        {
+            UnInit();
+        }
+
+        int CanBeOpened()
+        {
+            Init();
+            return m_hidDeviceObject ? 1 : 0;
+        }
+
+        const std::wstring& GetManufacturer()
+        {
+            Init();
+            return m_mfgr;
+        }
+
+        const std::wstring& GetProduct()
+        {
+            Init();
+            return m_product;
+        }
+
+        int GetReportCount(int type)
+        {
+            Init();
+            if (type >= 0 && type < 2)
+            {
+                return m_reportCount[type];
+            }
+            return 0;
+        }
+
+        int GetVID()
+        {
+            Init();
+            return m_vid;
+        }
+
+        int GetPID()
+        {
+            Init();
+            return m_pid;
+        }
+
+    private:
+        void Init()
+        {
+            if (m_isInitialized) return;
+            m_hidDeviceObject = CreateFile(m_deviceName.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr /*lpSecurityAttributes*/, 
+                OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr /*hTemplateFile*/);
+
+            if (m_hidDeviceObject)
+            {
+                m_preparsedData.Open(m_hidDeviceObject);
+
+                HIDD_ATTRIBUTES attributes{};
+                attributes.Size = sizeof(attributes);
+                HidD_GetAttributes(m_hidDeviceObject, &attributes);
+
+                m_vid = attributes.VendorID;
+                m_pid = attributes.ProductID;
+
+                const int USB_MAX_STRING = 127; // 126 plus a null terminator; max USB string length is 126.
+                wchar_t tempString[USB_MAX_STRING] = {0};
+
+                HidD_GetManufacturerString(m_hidDeviceObject, tempString, sizeof(tempString));
+                m_mfgr = tempString;
+
+                tempString[0] = 0;
+                HidD_GetProductString(m_hidDeviceObject, tempString, sizeof(tempString));
+                m_product = tempString;
+
+                m_isInitialized = true;
+            }
+        }
+
+        void UnInit()
+        {
+            if (!m_isInitialized) return;
+
+            m_isInitialized = false;
+        }
+
+        std::wstring m_deviceName;
+        bool m_isInitialized = false;
+
+        std::wstring m_mfgr;
+        std::wstring m_product;
+
+        int m_vid = 0;
+        int m_pid = 0;
+
+        int m_reportCount[3] = {};
+
+        FileHandle m_hidDeviceObject;
+        PreparsedData m_preparsedData;
+
+    };
+
+    class DeviceStore
+    {
+    public:
+        DeviceStore()
+        {
+            GUID hidGuid{};
+            HidD_GetHidGuid(&hidGuid);
+
+            auto classDevs = SetupDiGetClassDevsW(&hidGuid, nullptr /*Enumerator*/, nullptr /*hwndParent*/, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
+            if (classDevs == INVALID_HANDLE_VALUE) return;
+
+            DWORD memberIndex = 0;
+            SP_DEVICE_INTERFACE_DATA deviceInterfaceData{};
+            deviceInterfaceData.cbSize = sizeof(SP_DEVICE_INTERFACE_DATA);
+            while (SetupDiEnumDeviceInterfaces(classDevs, nullptr /*DeviceInfoData*/, &hidGuid, memberIndex++, &deviceInterfaceData))
+            {
+                // Get required size
+                DWORD requiredSize = 0;
+                SetupDiGetDeviceInterfaceDetail(classDevs, &deviceInterfaceData, nullptr /*DeviceInterfaceDetailData*/, 0, &requiredSize, nullptr /*DeviceInfoData*/);
+                if (requiredSize)
+                {
+                    auto deviceInterfaceDetailDataBuffer = std::make_unique<unsigned char[]>(requiredSize);
+                    auto deviceInterfaceDetailData = reinterpret_cast<SP_DEVICE_INTERFACE_DETAIL_DATA*>(deviceInterfaceDetailDataBuffer.get());
+                    deviceInterfaceDetailData->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA);
+                    if (SetupDiGetDeviceInterfaceDetail(classDevs, &deviceInterfaceData, deviceInterfaceDetailData, requiredSize, &requiredSize, nullptr /*DeviceInfoData*/))
+                    {
+                        m_handles.push_back(HandleFactory::GetNextHandle());
+                        m_devices.emplace(std::make_pair(m_handles.back(), Device(deviceInterfaceDetailData->DevicePath)));
+                    }
+                }
+            }
+            int error = GetLastError();
+        }
+
+        int GetCount()
+        {
+            return m_handles.size();
+        }
+
+        int GetHandle(int index)
+        {
+            return m_handles[index];
+        }
+
+        bool HasDevice(int handle)
+        {
+            return (m_devices.count(handle) != 0);
+        }
+
+        Device& GetDevice(int handle)
+        {
+            auto iter = m_devices.find(handle);
+            if (iter != m_devices.end())
+            {
+                return iter->second;
+            }
+            throw std::runtime_error("Device Not Found");
+        }
+    private:
+        std::vector<int> m_handles;
+        std::map<int, Device> m_devices;
+    };
+
+    std::map<int, DeviceStore> devices;
+
+    Device& LookupDevice(int handle)
+    {
+        for (auto&& [first, second] : devices)
+        {
+            if (second.HasDevice(handle))
+            {
+                return second.GetDevice(handle);
+            }
+        }
+        throw std::runtime_error("Invalid Device Handle");
+    }
+
+    int DoStringReturn(wchar_t* string, int stringSize, std::wstring& cppString)
+    {
+        if (string)
+        {
+            wcscpy_s(string, stringSize, cppString.c_str());
+            return wcslen(string) + 1;
+        }
+        else
+        {
+            return cppString.length() + 1;
+        }
+    }
+}
+
 extern "C"
 {
-
     int HID_IMPORT_EXPORT Devices_Open()
     {
-
+        int handle = HandleFactory::GetNextHandle();
+        devices.emplace(std::make_pair(handle, DeviceStore()));
+        return handle;
     }
 
     int HID_IMPORT_EXPORT Devices_Count(int handle)
     {
-
+        auto iter = devices.find(handle);
+        if (iter != devices.end())
+        {
+            return iter->second.GetCount();
+        }
+        return 0;
     }
 
     int HID_IMPORT_EXPORT Devices_OpenDevice(int handle, int index)
     {
-
+        auto iter = devices.find(handle);
+        if (iter != devices.end())
+        {
+            return iter->second.GetHandle(index);
+        }
+        return 0;
     }
 
     void HID_IMPORT_EXPORT Devices_Close(int handle)
     {
-
+        devices.erase(handle);
     }
 
 
     void HID_IMPORT_EXPORT Device_Close(int handle)
     {
+        LookupDevice(handle).Close();
+    }
 
+    int HID_IMPORT_EXPORT Device_Opened(int handle)
+    {
+        return LookupDevice(handle).CanBeOpened();
     }
 
     int HID_IMPORT_EXPORT Device_ReportCount(int handle, int type)
     {
-
+        return LookupDevice(handle).GetReportCount(type);
     }
 
     int HID_IMPORT_EXPORT Device_OpenReportCollection(int handle, int type, int id)
     {
-
+        return 0; // LookupDevice(handle).OpenReportCollection(type, id);
     }
 
-    int HID_IMPORT_EXPORT Device_Name(int handle, wchar_t* name, int nameSize)
+    int HID_IMPORT_EXPORT Device_Manufacturer(int handle, wchar_t* name, int nameSize)
     {
+        auto deviceName = LookupDevice(handle).GetManufacturer();
+        return DoStringReturn(name, nameSize, deviceName);
+    }
 
+    int HID_IMPORT_EXPORT Device_Product(int handle, wchar_t* name, int nameSize)
+    {
+        auto deviceName = LookupDevice(handle).GetProduct();
+        return DoStringReturn(name, nameSize, deviceName);
     }
 
     int HID_IMPORT_EXPORT Device_VID(int handle)
     {
-
+        return LookupDevice(handle).GetVID();
     }
 
     int HID_IMPORT_EXPORT Device_PID(int handle)
     {
-
+        return LookupDevice(handle).GetPID();
     }
 
 
@@ -73,27 +411,27 @@ extern "C"
 
     int HID_IMPORT_EXPORT Collection_Usage(int handle)
     {
-
+        return 0;
     }
 
     int HID_IMPORT_EXPORT Collection_CollectionCount(int handle)
     {
-
+        return 0;
     }
 
     int HID_IMPORT_EXPORT Collection_OpenCollection(int handle, int index)
     {
-
+        return 0;
     }
 
     int HID_IMPORT_EXPORT Collection_ButtonCount(int handle)
     {
-
+        return 0;
     }
 
     int HID_IMPORT_EXPORT Collection_ButtonUsage(int handle, int index)
     {
-
+        return 0;
     }
 
     int HID_IMPORT_EXPORT Collection_ButtonState(int handle, int index)
@@ -104,12 +442,12 @@ extern "C"
 
     int HID_IMPORT_EXPORT Collection_ValueCount(int handle)
     {
-
+        return 0;
     }
 
     int HID_IMPORT_EXPORT Collection_ValueUsage(int handle, int index)
     {
-
+        return 0;
     }
 
     int HID_IMPORT_EXPORT Collection_ValueValue(int handle, int index)

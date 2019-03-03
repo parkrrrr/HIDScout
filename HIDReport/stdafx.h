@@ -11,6 +11,9 @@
 // Windows Header Files
 #include <windows.h>
 
+#include <map>
+#include <vector>
+#include <memory>
 
 
 // reference additional headers your program requires here
