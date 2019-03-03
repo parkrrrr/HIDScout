@@ -7,9 +7,9 @@
 
     Usages
 
-    In this document, the integer representing a "usage" is a 16-bit integer.
-    The high byte (bits 8-15) represents the usage page.
-    The low byte (bits 0-7) represents the usage within that page.
+    In this document, the integer representing a "usage" is a 32-bit integer.
+    The high word (bits 16-31) represents the usage page.
+    The low word (bits 0-15) represents the usage within that page.
     This is consistent with the USB HID class specification.
 
 */

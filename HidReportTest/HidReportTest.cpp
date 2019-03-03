@@ -14,6 +14,42 @@ std::string Indent(size_t level)
     return std::string(level * 3, ' ');
 }
 
+void DumpCollection(int collection, int indent)
+{
+    auto subCollectionCount = HID::Collection_CollectionCount(collection);
+    auto buttonCount = HID::Collection_ButtonCount(collection);
+    auto valueCount = HID::Collection_ValueCount(collection);
+
+    std::cout << Indent(indent).c_str() << "Usage " << std::hex << HID::Collection_Usage(collection) << std::dec << "\n";
+
+    std::cout << Indent(indent).c_str();
+    if (buttonCount) std::cout << buttonCount << " buttons ";
+    if (valueCount) std::cout << valueCount << " values ";
+    if (subCollectionCount) std::cout << subCollectionCount << " subcollections ";
+    std::cout << "\n";
+
+    for (int buttonIndex = 0; buttonIndex < buttonCount; ++buttonIndex)
+    {
+        std::cout << Indent(indent).c_str() << "Button " << std::hex << HID::Collection_ButtonUsage(collection, buttonIndex) << std::dec << "\n";
+    }
+
+    for (int valueIndex = 0; valueIndex < valueCount; ++valueIndex)
+    {
+        std::cout << Indent(indent).c_str() << "Value  " << std::hex << HID::Collection_ValueUsage(collection, valueIndex) << std::dec << "\n";
+    }
+
+    for (int collectionIndex = 0; collectionIndex < subCollectionCount; ++collectionIndex)
+    {
+        auto subCollection = HID::Collection_OpenCollection(collection, collectionIndex);
+        if (subCollection)
+        {
+            std::cout << Indent(indent).c_str() << "----------------------------------\n";
+            DumpCollection(subCollection, indent + 1);
+            HID::Collection_Close(subCollection);
+        }
+    }
+}
+
 void DumpReport(int device, int type)
 {
     const char* typeNames[] = { "Input", "Output", "Feature" };
@@ -24,7 +60,32 @@ void DumpReport(int device, int type)
         return;
     }
 
-    std::cout << Indent(2).c_str() << typeNames[type] << " Report count " << count << "\n";
+    std::cout << Indent(2).c_str() << typeNames[type] << " Max Report ID " << count << "\n";
+
+    int startID = 0;
+    int endID = 0;
+    if (count > 0)
+    {
+        startID = 1;
+        endID = count;
+    }
+
+    for (int id = startID; id <= endID; ++id)
+    {
+        auto collection = HID::Device_OpenReportCollection(device, type, id);
+        if (collection)
+        {
+            auto subCollectionCount = HID::Collection_CollectionCount(collection);
+            auto buttonCount = HID::Collection_ButtonCount(collection);
+            auto valueCount = HID::Collection_ValueCount(collection);
+            if (subCollectionCount || buttonCount || valueCount)
+            {
+                std::cout << Indent(3).c_str() << "Report " << id << "\n";
+                DumpCollection(collection, 4);
+            }
+            HID::Collection_Close(collection);
+        }
+    }
 }
 
 int main()

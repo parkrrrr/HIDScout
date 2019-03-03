@@ -122,6 +122,44 @@ namespace
         PHIDP_PREPARSED_DATA preparsedData = nullptr;
     };
 
+    class Device;
+
+    class Collection
+    {
+    public:
+        Collection(Device& device, int type, int id, int collectionIndex) :
+            m_device(device), m_type(type), m_id(id), m_collectionIndex(collectionIndex)
+        {
+
+        }
+
+        int Usage();
+        int CollectionCount();
+        int OpenCollection(int index);
+        int ButtonCount();
+        int ButtonUsage(int index);
+        int ValueCount();
+        int ValueUsage(int index);
+
+    private:
+        Device& m_device;
+        int m_type;
+        int m_id;
+        int m_collectionIndex;
+    };
+
+    std::map<int, Collection> collections;
+
+    Collection& LookupCollection(int handle)
+    {
+        auto iter = collections.find(handle);
+        if (iter != collections.end())
+        {
+            return iter->second;
+        }
+        throw(std::runtime_error("Collection Not Found"));
+    }
+
     class Device
     {
     public:
@@ -179,6 +217,150 @@ namespace
             return m_pid;
         }
 
+        int OpenReportCollection(int type, int id)
+        {
+            return OpenCollection(type, id, -1, 0);
+        }
+
+        int GetCollectionUsage(int collectionIndex)
+        {
+            return (m_collectionNodes[collectionIndex].LinkUsagePage << 16) | m_collectionNodes[collectionIndex].LinkUsage;
+        }
+
+        int GetCollectionCount(int type, int id, int collectionIndex)
+        {
+            int count = 0;
+            int childIndex = m_collectionNodes[collectionIndex].FirstChild;
+            while (childIndex)
+            {
+                if ((m_collectionTypes[childIndex] & (1 << type)) && (NodeHasId(childIndex, id)))
+                {
+                    ++count;
+                }
+                childIndex = m_collectionNodes[childIndex].NextSibling;
+            }
+            return count;
+        }
+
+        int OpenCollection(int type, int id, int parentCollectionIndex, int childIndexWithinCollection)
+        {
+            if (parentCollectionIndex == -1)
+            {
+                return CreateCollection(type, id, 0);
+            }
+
+            int count = 0;
+            int childIndex = m_collectionNodes[parentCollectionIndex].FirstChild;
+            while (childIndex)
+            {
+                if ((m_collectionTypes[childIndex] & (1 << type)) && (NodeHasId(childIndex, id)))
+                {
+                    if (count == childIndexWithinCollection)
+                    {
+                        return CreateCollection(type, id, childIndex);
+                    }
+                    ++count;
+                }
+                childIndex = m_collectionNodes[childIndex].NextSibling;
+            }
+            return 0;
+        }
+
+        int GetButtonCount(int type, int id, int collectionIndex)
+        {
+            int count = 0;
+            for (int i = 0; i < m_buttonCount[type]; ++i)
+            {
+                auto& buttonCap = m_buttonCaps[type][i];
+                if ((buttonCap.ReportID == id) && (buttonCap.LinkCollection == collectionIndex) && (!buttonCap.IsAlias))
+                {
+                    if (buttonCap.IsRange)
+                    {
+                        count += buttonCap.Range.UsageMax - buttonCap.Range.UsageMin + 1;
+                    }
+                    else
+                    {
+                        count += 1;
+                    }
+                }
+            }
+            return count;
+        }
+
+        int GetButtonUsage(int type, int id, int collectionIndex, int buttonIndex)
+        {
+            int count = 0;
+            for (int i = 0; i < m_buttonCount[type]; ++i)
+            {
+                auto& buttonCap = m_buttonCaps[type][i];
+                if ((buttonCap.ReportID == id) && (buttonCap.LinkCollection == collectionIndex) && (!buttonCap.IsAlias))
+                {
+                    if (buttonCap.IsRange)
+                    {
+                        auto rangeCount = buttonCap.Range.UsageMax - buttonCap.Range.UsageMin + 1;
+
+                        if (count + rangeCount > buttonIndex)
+                        {
+                            return (buttonCap.UsagePage << 16) | (buttonCap.Range.UsageMin + buttonIndex - count);
+                        }
+
+                        count += rangeCount;
+                    }
+                    else
+                    {
+                        if (count == buttonIndex)
+                        {
+                            return (buttonCap.UsagePage << 16) | buttonCap.NotRange.Usage;
+                        }
+                        count += 1;
+                    }
+                }
+            }
+            return 0;
+        }
+
+        int GetValueCount(int type, int id, int collectionIndex)
+        {
+            int count = 0;
+            for (int i = 0; i < m_valueCount[type]; ++i)
+            {
+                auto& valueCap = m_valueCaps[type][i];
+                if ((valueCap.ReportID == id) && (valueCap.LinkCollection == collectionIndex) && (!valueCap.IsAlias))
+                {
+                    count += valueCap.ReportCount;
+                }
+            }
+            return count;
+        }
+
+        int GetValueUsage(int type, int id, int collectionIndex, int valueIndex)
+        {
+            int count = 0;
+            for (int i = 0; i < m_valueCount[type]; ++i)
+            {
+                auto& valueCap = m_valueCaps[type][i];
+                if ((valueCap.ReportID == id) && (valueCap.LinkCollection == collectionIndex) && (!valueCap.IsAlias))
+                {
+                    if (count + valueCap.ReportCount > valueIndex)
+                    {
+                        if (valueCap.IsRange)
+                        {
+                            int usage = valueCap.Range.UsageMin + valueIndex - count;
+                            if (usage > valueCap.Range.UsageMax) {
+                                usage = valueCap.Range.UsageMax;
+                                return (valueCap.UsagePage << 16) | usage;
+                            }
+                        }
+                        else {
+                            return (valueCap.UsagePage << 16) | valueCap.NotRange.Usage;
+                        }
+                    }
+                    count += valueCap.ReportCount;
+                }
+            }
+            return count;
+        }
+
     private:
         void Init()
         {
@@ -218,12 +400,17 @@ namespace
             // Get the top-level capabilities for the device
             HidP_GetCaps(m_preparsedData.Get(), &m_topLevelCaps);
             
-            // Get all of the collections and initialize their types to 'unused'
+            // Get all of the collections and initialize their types to 'unused' and their IDs to empty
             unsigned long length = m_topLevelCaps.NumberLinkCollectionNodes;
             m_collectionNodes = std::make_unique<HIDP_LINK_COLLECTION_NODE[]>(length);
             HidP_GetLinkCollectionNodes(m_collectionNodes.get(), &length, m_preparsedData.Get());
 
             m_collectionTypes.insert(m_collectionTypes.cbegin(), length, 0);
+
+            for (unsigned long i = 0; i < length; ++i)
+            {
+                m_collectionIDs.push_back(std::vector<int>());
+            }
 
             // Get the button capabilities for all of the report types
             GetButtonCaps(HidP_Input, m_topLevelCaps.NumberInputButtonCaps);
@@ -244,20 +431,31 @@ namespace
             }
         }
 
-        void UpdateLinkCollectionTypes(unsigned short collectionID, HIDP_REPORT_TYPE type)
+        bool NodeHasId(int collectionID, int id)
+        {
+            return (std::find(m_collectionIDs[collectionID].begin(), m_collectionIDs[collectionID].end(), id) != m_collectionIDs[collectionID].end());
+        }
+
+        void UpdateLinkCollectionTypesAndIDs(unsigned short collectionID, HIDP_REPORT_TYPE type, int id)
         {
             int flag = 1 << type;
 
             do
             {
                 m_collectionTypes[collectionID] |= flag;
+                if (!NodeHasId(collectionID, id))
+                {
+                    m_collectionIDs[collectionID].push_back(id);
+                }
                 collectionID = m_collectionNodes[collectionID].Parent;
             } while (collectionID);
         }
 
         void GetButtonCaps(HIDP_REPORT_TYPE type, unsigned short count)
         {
+            m_buttonCount[type] = count;
             if (!count) return;
+
             m_buttonCaps[type] = std::make_unique<HIDP_BUTTON_CAPS[]>(count);
             HidP_GetButtonCaps(type, m_buttonCaps[type].get(), &count, m_preparsedData.Get());
 
@@ -268,12 +466,13 @@ namespace
                 {
                     m_reportCount[type] = buttonCap.ReportID;
                 }
-                UpdateLinkCollectionTypes(buttonCap.LinkCollection, type);
+                UpdateLinkCollectionTypesAndIDs(buttonCap.LinkCollection, type, buttonCap.ReportID);
             }
         }
 
         void GetValueCaps(HIDP_REPORT_TYPE type, unsigned short count)
         {
+            m_valueCount[type] = count;
             if (!count) return;
             m_valueCaps[type] = std::make_unique<HIDP_VALUE_CAPS[]>(count);
             HidP_GetValueCaps(type, m_valueCaps[type].get(), &count, m_preparsedData.Get());
@@ -285,8 +484,15 @@ namespace
                 {
                     m_reportCount[type] = valueCap.ReportID;
                 }
-                UpdateLinkCollectionTypes(valueCap.LinkCollection, type);
+                UpdateLinkCollectionTypesAndIDs(valueCap.LinkCollection, type, valueCap.ReportID);
             }
+        }
+
+        int CreateCollection(int type, int id, int collectionIndex)
+        {
+            int handle = HandleFactory::GetNextHandle();
+            collections.emplace(std::make_pair(handle, Collection(*this, type, id, collectionIndex)));
+            return handle;
         }
 
         void UnInit()
@@ -312,15 +518,57 @@ namespace
 
         HIDP_CAPS m_topLevelCaps = {};
         std::unique_ptr<HIDP_LINK_COLLECTION_NODE[]> m_collectionNodes;
+        
+        int m_buttonCount[3] = {};
         std::unique_ptr<HIDP_BUTTON_CAPS[]> m_buttonCaps[3];
+
+        int m_valueCount[3] = {};
         std::unique_ptr<HIDP_VALUE_CAPS[]> m_valueCaps[3];
 
         const int COL_INPUT = 1 << HidP_Input;
         const int COL_OUTPUT = 1 << HidP_Output;
         const int COL_FEATURE = 1 << HidP_Feature;
         std::vector<int> m_collectionTypes;
+        std::vector<std::vector<int>> m_collectionIDs;
 
     };
+
+    int Collection::Usage()
+    {
+        return m_device.GetCollectionUsage(m_collectionIndex);
+    }
+
+    int Collection::CollectionCount()
+    {
+        return m_device.GetCollectionCount(m_type, m_id, m_collectionIndex);
+    }
+
+    int Collection::OpenCollection(int index)
+    {
+        return m_device.OpenCollection(m_type, m_id, m_collectionIndex, index);
+    }
+
+    int Collection::ButtonCount()
+    {
+        return m_device.GetButtonCount(m_type, m_id, m_collectionIndex);
+    }
+
+    int Collection::ButtonUsage(int index)
+    {
+        return m_device.GetButtonUsage(m_type, m_id, m_collectionIndex, index);
+    }
+
+    int Collection::ValueCount()
+    {
+        return m_device.GetValueCount(m_type, m_id, m_collectionIndex);
+    }
+
+    int Collection::ValueUsage(int index)
+    {
+        return m_device.GetValueUsage(m_type, m_id, m_collectionIndex, index);
+    }
+
+
 
     class DeviceStore
     {
@@ -465,7 +713,7 @@ extern "C"
 
     int HID_IMPORT_EXPORT Device_OpenReportCollection(int handle, int type, int id)
     {
-        return 0; // LookupDevice(handle).OpenReportCollection(type, id);
+        return LookupDevice(handle).OpenReportCollection(type, id);
     }
 
     int HID_IMPORT_EXPORT Device_Manufacturer(int handle, wchar_t* name, int nameSize)
@@ -494,32 +742,32 @@ extern "C"
 
     void HID_IMPORT_EXPORT Collection_Close(int handle)
     {
-
+        collections.erase(handle);
     }
 
     int HID_IMPORT_EXPORT Collection_Usage(int handle)
     {
-        return 0;
+        return LookupCollection(handle).Usage();
     }
 
     int HID_IMPORT_EXPORT Collection_CollectionCount(int handle)
     {
-        return 0;
+        return LookupCollection(handle).CollectionCount();
     }
 
     int HID_IMPORT_EXPORT Collection_OpenCollection(int handle, int index)
     {
-        return 0;
+        return LookupCollection(handle).OpenCollection(index);
     }
 
     int HID_IMPORT_EXPORT Collection_ButtonCount(int handle)
     {
-        return 0;
+        return LookupCollection(handle).ButtonCount();
     }
 
     int HID_IMPORT_EXPORT Collection_ButtonUsage(int handle, int index)
     {
-        return 0;
+        return LookupCollection(handle).ButtonUsage(index);
     }
 
     int HID_IMPORT_EXPORT Collection_ButtonState(int handle, int index)
@@ -530,12 +778,12 @@ extern "C"
 
     int HID_IMPORT_EXPORT Collection_ValueCount(int handle)
     {
-        return 0;
+        return LookupCollection(handle).ValueCount();
     }
 
     int HID_IMPORT_EXPORT Collection_ValueUsage(int handle, int index)
     {
-        return 0;
+        return LookupCollection(handle).ValueUsage(index);
     }
 
     int HID_IMPORT_EXPORT Collection_ValueValue(int handle, int index)
