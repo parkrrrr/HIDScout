@@ -83,7 +83,7 @@ XBox Controller driver's imagination. If you want to follow along at home, all o
 within that page. Anything in the below description that maps a control in the HID report to a control on the controller
 was discovered using the Controller Properties dialog in Windows 10:
 
-![Screenshot of the Controller Properties dialog](Controller.png "Screenshot of the Controller Properties dialog)
+![Screenshot of the Controller Properties dialog](Controller.png "Screenshot of the Controller Properties dialog")
 
 This device has one Input report. That report's top-level usage is 00010005, which is on the Generic Desktop Page (0001)
 and represents a Game Pad (0005). It contains 10 buttons, one non-button control, and three additional collections of
