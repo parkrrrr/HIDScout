@@ -40,71 +40,39 @@ Here's an example of the output. This device is a knockoff XBox360 controller ma
 belongs to Logic3, and the manufacturer chose to not provide a name for themselves in the USB descriptor. Normally,
 that manufacturer name would precede the :: on the second line.)
 
-`
+~~~~
 VID e6f  PID 501
-
     :: Controller (Wired Controller for Xbox 360)
-	
       Input Max Report ID 0
-	  
          Report 0
-		 
             Usage 10005
-			
             10 buttons 1 values 3 subcollections
-			
             Button 90001
-			
             Button 90002
-			
             Button 90003
-			
             Button 90004
-			
             Button 90005
-			
             Button 90006
-			
             Button 90007
-			
             Button 90008
-			
             Button 90009
-			
             Button 9000a
-			
             Value  10039
-			
             ----------------------------------
-			
                Usage 10000
-			   
                1 values
-			   
                Value  10032
-			   
             ----------------------------------
-			
                Usage 10000
-			   
                2 values
-			   
                Value  10034
-			   
                Value  10033
-			   
             ----------------------------------
-			
                Usage 10000
-			   
                2 values
-			   
                Value  10031
-			   
                Value  10030
-			   
-`
-
+~~~~
 
 ## Troubleshooting
 
