@@ -7,12 +7,12 @@ namespace winrt::HIDScout::implementation
     {
         std::wstring deviceXaml = LR"**(
 		    <DataTemplate xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-			    <TreeViewItem>
+			    <TreeViewItem Padding="3">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Vendor ID" FontWeight="Bold" />
+                            <TextBlock Text="Vendor ID" FontWeight="Bold" Padding="30,0,10,0" />
                             <TextBlock Text="{Binding Content.VID}" />
-                            <TextBlock Text="    Product ID" FontWeight="Bold" />
+                            <TextBlock Text="Product ID" FontWeight="Bold" Padding="30,0,10,0"/>
                             <TextBlock Text="{Binding Content.PID}" />
                         </StackPanel>
                         <TextBlock Text="{Binding Content.Manufacturer}" />
@@ -51,6 +51,8 @@ namespace winrt::HIDScout::implementation
         case HIDScout::EntryType::ReportType:
             return m_reportTypeTemplate;
         }
+
+        return m_deviceTemplate;
     }
 
     hstring HIDScoutTemplateSelector::blah()

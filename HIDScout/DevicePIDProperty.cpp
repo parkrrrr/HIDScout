@@ -17,7 +17,7 @@ namespace winrt::HIDScout::implementation
     {
         auto pid = target.as<DeviceItem>().PID();
         std::wstringstream stream;
-        stream << L" " << std::hex << std::setw(4) << std::setfill(L'0') << pid;
+        stream << std::hex << std::setw(4) << std::setfill(L'0') << pid;
         return winrt::box_value(hstring(stream.str()));
     }
 
