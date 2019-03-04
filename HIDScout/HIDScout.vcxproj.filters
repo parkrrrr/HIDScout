@@ -13,6 +13,18 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\Tree Item Defs">
+      <UniqueIdentifier>{97936ae0-7bb7-4ac0-aa49-1a40faa5e9f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Tree Item Defs">
+      <UniqueIdentifier>{f03c2310-fabb-4f9b-b1e7-54c2be4d0d6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Tree Item Defs\Properties">
+      <UniqueIdentifier>{9c9bb376-4f3c-40ef-9a99-51a8e18d089d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tree Item Defs\Properties">
+      <UniqueIdentifier>{3c015c48-861d-4d6a-8c0b-b51597b0b2ef}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">
@@ -36,6 +48,45 @@
     <ClInclude Include="HIDScoutTemplateSelector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Button.h">
+      <Filter>Header Files\Tree Item Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="Collection.h">
+      <Filter>Header Files\Tree Item Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="DeviceItem.h">
+      <Filter>Header Files\Tree Item Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="Report.h">
+      <Filter>Header Files\Tree Item Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="ReportType.h">
+      <Filter>Header Files\Tree Item Defs</Filter>
+    </ClInclude>
+    <ClInclude Include="DeviceVIDProperty.h">
+      <Filter>Header Files\Tree Item Defs\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="DeviceManufacturerProperty.h">
+      <Filter>Header Files\Tree Item Defs\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="DevicePIDProperty.h">
+      <Filter>Header Files\Tree Item Defs\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="DeviceProductProperty.h">
+      <Filter>Header Files\Tree Item Defs\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="GenericUsagePageProperty.h">
+      <Filter>Header Files\Tree Item Defs\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="GenericUsageProperty.h">
+      <Filter>Header Files\Tree Item Defs\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="ReportTypeNameProperty.h">
+      <Filter>Header Files\Tree Item Defs\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="Value.h">
+      <Filter>Header Files\Tree Item Defs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HIDScout.cpp">
@@ -55,6 +106,45 @@
     </ClCompile>
     <ClCompile Include="Generated Files\module.g.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Button.cpp">
+      <Filter>Source Files\Tree Item Defs</Filter>
+    </ClCompile>
+    <ClCompile Include="Collection.cpp">
+      <Filter>Source Files\Tree Item Defs</Filter>
+    </ClCompile>
+    <ClCompile Include="DeviceItem.cpp">
+      <Filter>Source Files\Tree Item Defs</Filter>
+    </ClCompile>
+    <ClCompile Include="Report.cpp">
+      <Filter>Source Files\Tree Item Defs</Filter>
+    </ClCompile>
+    <ClCompile Include="ReportType.cpp">
+      <Filter>Source Files\Tree Item Defs</Filter>
+    </ClCompile>
+    <ClCompile Include="DeviceVIDProperty.cpp">
+      <Filter>Source Files\Tree Item Defs\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="DeviceManufacturerProperty.cpp">
+      <Filter>Source Files\Tree Item Defs\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="DevicePIDProperty.cpp">
+      <Filter>Source Files\Tree Item Defs\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="DeviceProductProperty.cpp">
+      <Filter>Source Files\Tree Item Defs\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="GenericUsagePageProperty.cpp">
+      <Filter>Source Files\Tree Item Defs\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="GenericUsageProperty.cpp">
+      <Filter>Source Files\Tree Item Defs\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="ReportTypeNameProperty.cpp">
+      <Filter>Source Files\Tree Item Defs\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="Value.cpp">
+      <Filter>Source Files\Tree Item Defs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -78,6 +168,9 @@
   </ItemGroup>
   <ItemGroup>
     <Midl Include="HIDScoutTemplateSelector.idl">
+      <Filter>Source Files</Filter>
+    </Midl>
+    <Midl Include="TreeItems.idl">
       <Filter>Source Files</Filter>
     </Midl>
   </ItemGroup>

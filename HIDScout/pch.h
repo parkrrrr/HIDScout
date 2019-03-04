@@ -15,9 +15,11 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <memory.h>
+#include <sstream>
+#include <iomanip>
 
 
-// reference additional headers your program requires here
+// XAML Headers
 #include <Unknwn.h>
 #include <winrt/base.h>
 #include <winrt/Windows.System.h>
@@ -31,4 +33,10 @@
 #include <winrt/Windows.UI.Xaml.Data.h>
 
 #include <windows.ui.xaml.hosting.desktopwindowxamlsource.h>
+
+// Project Headers
+namespace HIDReport
+{
+#include "../HIDReport/HIDReport.h"
+}
 

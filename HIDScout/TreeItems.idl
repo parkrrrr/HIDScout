@@ -1,0 +1,90 @@
+namespace HIDScout
+{
+    enum EntryType
+    {
+        Device,
+        ReportType,
+        Report,
+        Collection,
+        Button,
+        Value
+    };
+
+    interface ITreeItemType
+    {
+        EntryType TIType{ get; };
+    };
+
+    runtimeclass DeviceItem : ITreeItemType, Windows.UI.Xaml.Data.ICustomPropertyProvider
+    {
+        UInt16 VID { get; };
+        UInt16 PID{ get; };
+        String Manufacturer{ get; };
+        String Product{ get; };
+    };
+
+    runtimeclass DeviceVIDProperty : Windows.UI.Xaml.Data.ICustomProperty
+    {
+        DeviceVIDProperty();
+    };
+
+    runtimeclass DevicePIDProperty : Windows.UI.Xaml.Data.ICustomProperty
+    {
+        DevicePIDProperty();
+    };
+
+    runtimeclass DeviceManufacturerProperty : Windows.UI.Xaml.Data.ICustomProperty
+    {
+        DeviceManufacturerProperty();
+    };
+
+    runtimeclass DeviceProductProperty : Windows.UI.Xaml.Data.ICustomProperty
+    {
+        DeviceProductProperty();
+    };
+
+    runtimeclass ReportType : ITreeItemType, Windows.UI.Xaml.Data.ICustomPropertyProvider
+    {
+        String TypeName{ get; };
+    };
+
+    runtimeclass ReportTypeNameProperty : Windows.UI.Xaml.Data.ICustomProperty
+    {
+        ReportTypeNameProperty();
+    };
+
+    runtimeclass Report : ITreeItemType, Windows.UI.Xaml.Data.ICustomPropertyProvider
+    {
+        UInt16 UsagePage{ get; };
+        UInt16 Usage{ get; };
+    };
+
+    runtimeclass Collection : ITreeItemType, Windows.UI.Xaml.Data.ICustomPropertyProvider
+    {
+        UInt16 UsagePage{ get; };
+        UInt16 Usage{ get; };
+    };
+
+    runtimeclass Button : ITreeItemType, Windows.UI.Xaml.Data.ICustomPropertyProvider
+    {
+        UInt16 UsagePage{ get; };
+        UInt16 Usage{ get; };
+    };
+
+    runtimeclass Value : ITreeItemType, Windows.UI.Xaml.Data.ICustomPropertyProvider
+    {
+        UInt16 UsagePage{ get; };
+        UInt16 Usage{ get; };
+    };
+
+    runtimeclass GenericUsagePageProperty : Windows.UI.Xaml.Data.ICustomProperty
+    {
+        GenericUsagePageProperty();
+    };
+
+    runtimeclass GenericUsageProperty : Windows.UI.Xaml.Data.ICustomProperty
+    {
+        GenericUsageProperty();
+    };
+
+}

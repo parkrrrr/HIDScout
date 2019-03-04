@@ -65,9 +65,6 @@ LRESULT CALLBACK MainWindow::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPA
     {
         PAINTSTRUCT paint{};
         BeginPaint(hWnd, &paint);
-        HGDIOBJ old = SelectObject(paint.hdc, GetStockObject(BLACK_BRUSH));
-        Rectangle(paint.hdc, 20, 20, 40, 40);
-        SelectObject(paint.hdc, old);
         EndPaint(hWnd, &paint);
         return 0;
     }

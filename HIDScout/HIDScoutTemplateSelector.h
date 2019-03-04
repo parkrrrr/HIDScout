@@ -17,6 +17,7 @@ namespace winrt::HIDScout::implementation
         }
     private:
         winrt::Windows::UI::Xaml::DataTemplate m_deviceTemplate = nullptr;
+        winrt::Windows::UI::Xaml::DataTemplate m_reportTypeTemplate = nullptr;
 
     };
 }
