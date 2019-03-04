@@ -2,6 +2,7 @@
 //
 
 #include "pch.h"
+#include <memory>
 #include <iostream>
 
 namespace HID
@@ -120,7 +121,7 @@ int main()
                     wcstombs_s(nullptr, sproduct.get(), psize, product.get(), psize);
 
                     std::cout << "VID " << std::hex << vid << "  PID " << pid << std::dec << "\n" <<
-                        "   " << smfgr << " :: " << sproduct << "\n";
+                        "   " << smfgr.get() << " :: " << sproduct.get() << "\n";
 
                     for (int i = 0; i < 3; ++i)
                     {
