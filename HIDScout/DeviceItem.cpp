@@ -1,9 +1,6 @@
 ﻿#include "pch.h"
 #include "DeviceItem.h"
-#include "DeviceVIDProperty.h"
-#include "DevicePIDProperty.h"
-#include "DeviceManufacturerProperty.h"
-#include "DeviceProductProperty.h"
+#include "TreeViewItemProperty.h"
 
 namespace winrt::HIDScout::implementation
 {
@@ -56,13 +53,7 @@ namespace winrt::HIDScout::implementation
 
     Windows::UI::Xaml::Data::ICustomProperty DeviceItem::GetCustomProperty(hstring const& name)
     {
-        std::wstring sname(name);
-
-        if (sname == L"VID") return winrt::make<winrt::HIDScout::implementation::DeviceVIDProperty>().as<Windows::UI::Xaml::Data::ICustomProperty>();
-        if (sname == L"PID") return winrt::make<winrt::HIDScout::implementation::DevicePIDProperty>().as<Windows::UI::Xaml::Data::ICustomProperty>();
-        if (sname == L"Manufacturer") return winrt::make<winrt::HIDScout::implementation::DeviceManufacturerProperty>().as<Windows::UI::Xaml::Data::ICustomProperty>();
-        if (sname == L"Product") return winrt::make<winrt::HIDScout::implementation::DeviceProductProperty>().as<Windows::UI::Xaml::Data::ICustomProperty>();
-        DebugBreak(); throw hresult_not_implemented();
+        return winrt::make<winrt::HIDScout::implementation::TreeViewItemProperty>(HIDScout::EntryType::Device, name).as<Windows::UI::Xaml::Data::ICustomProperty>();
     }
 
     Windows::UI::Xaml::Data::ICustomProperty DeviceItem::GetIndexedProperty(hstring const& name, Windows::UI::Xaml::Interop::TypeName const& type)

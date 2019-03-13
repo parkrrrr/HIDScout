@@ -10,7 +10,7 @@ namespace winrt::HIDScout::implementation
 			    <TreeViewItem Padding="3">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Vendor ID" FontWeight="Bold" Padding="30,0,10,0" />
+                            <TextBlock Text="Vendor ID" FontWeight="Bold" Padding="0,0,10,0" />
                             <TextBlock Text="{Binding Content.VID}" />
                             <TextBlock Text="Product ID" FontWeight="Bold" Padding="30,0,10,0"/>
                             <TextBlock Text="{Binding Content.PID}" />

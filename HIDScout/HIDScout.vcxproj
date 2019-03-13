@@ -106,6 +106,10 @@
     <Manifest>
       <AdditionalManifestFiles>HIDScout.exe.manifest</AdditionalManifestFiles>
     </Manifest>
+    <Midl />
+    <Midl>
+      <PrependWithABINamepsace>false</PrependWithABINamepsace>
+    </Midl>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -126,6 +130,10 @@
     <Manifest>
       <AdditionalManifestFiles>HIDScout.exe.manifest</AdditionalManifestFiles>
     </Manifest>
+    <Midl />
+    <Midl>
+      <PrependWithABINamepsace>false</PrependWithABINamepsace>
+    </Midl>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -150,6 +158,10 @@
     <Manifest>
       <AdditionalManifestFiles>HIDScout.exe.manifest</AdditionalManifestFiles>
     </Manifest>
+    <Midl />
+    <Midl>
+      <PrependWithABINamepsace>false</PrependWithABINamepsace>
+    </Midl>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -174,27 +186,24 @@
     <Manifest>
       <AdditionalManifestFiles>HIDScout.exe.manifest</AdditionalManifestFiles>
     </Manifest>
+    <Midl />
+    <Midl>
+      <PrependWithABINamepsace>false</PrependWithABINamepsace>
+    </Midl>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Button.h" />
     <ClInclude Include="Collection.h" />
     <ClInclude Include="DeviceItem.h" />
-    <ClInclude Include="DeviceManufacturerProperty.h" />
-    <ClInclude Include="DevicePIDProperty.h" />
-    <ClInclude Include="DeviceProductProperty.h" />
-    <ClInclude Include="DeviceVIDProperty.h" />
-    <ClInclude Include="GenericUsagePageProperty.h" />
-    <ClInclude Include="GenericUsageProperty.h" />
     <ClInclude Include="HIDScout.h" />
     <ClInclude Include="HIDScoutTemplateSelector.h" />
     <ClInclude Include="Report.h" />
     <ClInclude Include="ReportType.h" />
-    <ClInclude Include="ReportTypeIconProperty.h" />
-    <ClInclude Include="ReportTypeNameProperty.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TreeView.h" />
+    <ClInclude Include="TreeViewItemProperty.h" />
     <ClInclude Include="Value.h" />
     <ClInclude Include="window.h" />
   </ItemGroup>
@@ -202,13 +211,7 @@
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="Collection.cpp" />
     <ClCompile Include="DeviceItem.cpp" />
-    <ClCompile Include="DeviceManufacturerProperty.cpp" />
-    <ClCompile Include="DevicePIDProperty.cpp" />
-    <ClCompile Include="DeviceProductProperty.cpp" />
-    <ClCompile Include="DeviceVIDProperty.cpp" />
     <ClCompile Include="Generated Files\module.g.cpp" />
-    <ClCompile Include="GenericUsagePageProperty.cpp" />
-    <ClCompile Include="GenericUsageProperty.cpp" />
     <ClCompile Include="HIDScout.cpp" />
     <ClCompile Include="HIDScoutTemplateSelector.cpp" />
     <ClCompile Include="pch.cpp">
@@ -219,9 +222,8 @@
     </ClCompile>
     <ClCompile Include="Report.cpp" />
     <ClCompile Include="ReportType.cpp" />
-    <ClCompile Include="ReportTypeIconProperty.cpp" />
-    <ClCompile Include="ReportTypeNameProperty.cpp" />
     <ClCompile Include="TreeView.cpp" />
+    <ClCompile Include="TreeViewItemProperty.cpp" />
     <ClCompile Include="Value.cpp" />
     <ClCompile Include="window.cpp" />
   </ItemGroup>
@@ -241,7 +243,14 @@
     </Manifest>
   </ItemGroup>
   <ItemGroup>
-    <Midl Include="TreeItems.idl" />
+    <Midl Include="TreeItems.idl">
+      <PrependWithABINamepsace Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</PrependWithABINamepsace>
+      <AdditionalMetadataDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(WindowsSDK_MetadataFoundationPath);%(AdditionalMetadataDirectories)</AdditionalMetadataDirectories>
+      <PrependWithABINamepsace Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</PrependWithABINamepsace>
+      <AdditionalMetadataDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(WindowsSDK_MetadataFoundationPath);%(AdditionalMetadataDirectories)</AdditionalMetadataDirectories>
+      <AdditionalMetadataDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(WindowsSDK_MetadataFoundationPath);%(AdditionalMetadataDirectories)</AdditionalMetadataDirectories>
+      <AdditionalMetadataDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(WindowsSDK_MetadataFoundationPath);%(AdditionalMetadataDirectories)</AdditionalMetadataDirectories>
+    </Midl>
     <Midl Include="HIDScoutTemplateSelector.idl" />
   </ItemGroup>
   <ItemGroup>

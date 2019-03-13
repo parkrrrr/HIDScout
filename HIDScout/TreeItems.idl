@@ -15,6 +15,11 @@ namespace HIDScout
         EntryType TIType{ get; };
     };
 
+    runtimeclass TreeViewItemProperty : Windows.UI.Xaml.Data.ICustomProperty
+    {
+        TreeViewItemProperty();
+    };
+
     runtimeclass DeviceItem : ITreeItemType, Windows.UI.Xaml.Data.ICustomPropertyProvider
     {
         UInt16 VID { get; };
@@ -23,41 +28,11 @@ namespace HIDScout
         String Product{ get; };
     };
 
-    runtimeclass DeviceVIDProperty : Windows.UI.Xaml.Data.ICustomProperty
-    {
-        DeviceVIDProperty();
-    };
-
-    runtimeclass DevicePIDProperty : Windows.UI.Xaml.Data.ICustomProperty
-    {
-        DevicePIDProperty();
-    };
-
-    runtimeclass DeviceManufacturerProperty : Windows.UI.Xaml.Data.ICustomProperty
-    {
-        DeviceManufacturerProperty();
-    };
-
-    runtimeclass DeviceProductProperty : Windows.UI.Xaml.Data.ICustomProperty
-    {
-        DeviceProductProperty();
-    };
-
     runtimeclass ReportType : ITreeItemType, Windows.UI.Xaml.Data.ICustomPropertyProvider
     {
         String TypeName{ get; };
         String TypeIcon{ get; };
     };
-
-    runtimeclass ReportTypeNameProperty : Windows.UI.Xaml.Data.ICustomProperty
-    {
-        ReportTypeNameProperty();
-    };
-
-    runtimeclass ReportTypeIconProperty : Windows.UI.Xaml.Data.ICustomProperty
-    {
-        ReportTypeIconProperty();
-    }
 
     runtimeclass Report : ITreeItemType, Windows.UI.Xaml.Data.ICustomPropertyProvider
     {
@@ -83,14 +58,4 @@ namespace HIDScout
         UInt16 Usage{ get; };
     };
 
-    runtimeclass GenericUsagePageProperty : Windows.UI.Xaml.Data.ICustomProperty
-    {
-        GenericUsagePageProperty();
-    };
-
-    runtimeclass GenericUsageProperty : Windows.UI.Xaml.Data.ICustomProperty
-    {
-        GenericUsageProperty();
-    };
-
-}
+ }

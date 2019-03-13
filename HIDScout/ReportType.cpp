@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "ReportType.h"
+#include "TreeViewItemProperty.h"
 
 namespace winrt::HIDScout::implementation
 {
@@ -20,7 +21,7 @@ namespace winrt::HIDScout::implementation
 
     Windows::UI::Xaml::Data::ICustomProperty ReportType::GetCustomProperty(hstring const& name)
     {
-        DebugBreak(); throw hresult_not_implemented();
+        return winrt::make<winrt::HIDScout::implementation::TreeViewItemProperty>(HIDScout::EntryType::Device, name).as<Windows::UI::Xaml::Data::ICustomProperty>();
     }
 
     Windows::UI::Xaml::Data::ICustomProperty ReportType::GetIndexedProperty(hstring const& name, Windows::UI::Xaml::Interop::TypeName const& type)

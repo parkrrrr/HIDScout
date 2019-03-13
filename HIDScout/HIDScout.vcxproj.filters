@@ -19,12 +19,6 @@
     <Filter Include="Header Files\Tree Item Defs">
       <UniqueIdentifier>{f03c2310-fabb-4f9b-b1e7-54c2be4d0d6e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Tree Item Defs\Properties">
-      <UniqueIdentifier>{9c9bb376-4f3c-40ef-9a99-51a8e18d089d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Tree Item Defs\Properties">
-      <UniqueIdentifier>{3c015c48-861d-4d6a-8c0b-b51597b0b2ef}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">
@@ -63,32 +57,11 @@
     <ClInclude Include="ReportType.h">
       <Filter>Header Files\Tree Item Defs</Filter>
     </ClInclude>
-    <ClInclude Include="DeviceVIDProperty.h">
-      <Filter>Header Files\Tree Item Defs\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="DeviceManufacturerProperty.h">
-      <Filter>Header Files\Tree Item Defs\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="DevicePIDProperty.h">
-      <Filter>Header Files\Tree Item Defs\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="DeviceProductProperty.h">
-      <Filter>Header Files\Tree Item Defs\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="GenericUsagePageProperty.h">
-      <Filter>Header Files\Tree Item Defs\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="GenericUsageProperty.h">
-      <Filter>Header Files\Tree Item Defs\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="ReportTypeNameProperty.h">
-      <Filter>Header Files\Tree Item Defs\Properties</Filter>
-    </ClInclude>
     <ClInclude Include="Value.h">
       <Filter>Header Files\Tree Item Defs</Filter>
     </ClInclude>
-    <ClInclude Include="ReportTypeIconProperty.h">
-      <Filter>Header Files\Tree Item Defs\Properties</Filter>
+    <ClInclude Include="TreeViewItemProperty.h">
+      <Filter>Header Files\Tree Item Defs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -125,32 +98,11 @@
     <ClCompile Include="ReportType.cpp">
       <Filter>Source Files\Tree Item Defs</Filter>
     </ClCompile>
-    <ClCompile Include="DeviceVIDProperty.cpp">
-      <Filter>Source Files\Tree Item Defs\Properties</Filter>
-    </ClCompile>
-    <ClCompile Include="DeviceManufacturerProperty.cpp">
-      <Filter>Source Files\Tree Item Defs\Properties</Filter>
-    </ClCompile>
-    <ClCompile Include="DevicePIDProperty.cpp">
-      <Filter>Source Files\Tree Item Defs\Properties</Filter>
-    </ClCompile>
-    <ClCompile Include="DeviceProductProperty.cpp">
-      <Filter>Source Files\Tree Item Defs\Properties</Filter>
-    </ClCompile>
-    <ClCompile Include="GenericUsagePageProperty.cpp">
-      <Filter>Source Files\Tree Item Defs\Properties</Filter>
-    </ClCompile>
-    <ClCompile Include="GenericUsageProperty.cpp">
-      <Filter>Source Files\Tree Item Defs\Properties</Filter>
-    </ClCompile>
-    <ClCompile Include="ReportTypeNameProperty.cpp">
-      <Filter>Source Files\Tree Item Defs\Properties</Filter>
-    </ClCompile>
     <ClCompile Include="Value.cpp">
       <Filter>Source Files\Tree Item Defs</Filter>
     </ClCompile>
-    <ClCompile Include="ReportTypeIconProperty.cpp">
-      <Filter>Source Files\Tree Item Defs\Properties</Filter>
+    <ClCompile Include="TreeViewItemProperty.cpp">
+      <Filter>Source Files\Tree Item Defs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
