@@ -9,6 +9,7 @@ namespace winrt::HIDScout::implementation
         ReportType() = delete;
 
         hstring TypeName();
+        hstring TypeIcon();
         HIDScout::EntryType TIType();
         Windows::UI::Xaml::Data::ICustomProperty GetCustomProperty(hstring const& name);
         Windows::UI::Xaml::Data::ICustomProperty GetIndexedProperty(hstring const& name, Windows::UI::Xaml::Interop::TypeName const& type);

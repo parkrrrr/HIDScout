@@ -28,7 +28,10 @@ namespace winrt::HIDScout::implementation
         std::wstring reportTypeXaml = LR"**(
 		    <DataTemplate xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
 			    <TreeViewItem>
-                    <TextBlock Text="{Binding Content.ReportType}" />
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Content.Icon}" FontSize="20" Padding="10" />
+                        <TextBlock Text="{Binding Content.ReportType}" />
+                    </StackPanel>
 			    </TreeViewItem>
 		    </DataTemplate>
 	    )**";

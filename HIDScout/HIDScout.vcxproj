@@ -189,6 +189,7 @@
     <ClInclude Include="HIDScoutTemplateSelector.h" />
     <ClInclude Include="Report.h" />
     <ClInclude Include="ReportType.h" />
+    <ClInclude Include="ReportTypeIconProperty.h" />
     <ClInclude Include="ReportTypeNameProperty.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="pch.h" />
@@ -218,6 +219,7 @@
     </ClCompile>
     <ClCompile Include="Report.cpp" />
     <ClCompile Include="ReportType.cpp" />
+    <ClCompile Include="ReportTypeIconProperty.cpp" />
     <ClCompile Include="ReportTypeNameProperty.cpp" />
     <ClCompile Include="TreeView.cpp" />
     <ClCompile Include="Value.cpp" />

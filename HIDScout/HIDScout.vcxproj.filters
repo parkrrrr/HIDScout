@@ -87,6 +87,9 @@
     <ClInclude Include="Value.h">
       <Filter>Header Files\Tree Item Defs</Filter>
     </ClInclude>
+    <ClInclude Include="ReportTypeIconProperty.h">
+      <Filter>Header Files\Tree Item Defs\Properties</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HIDScout.cpp">
@@ -145,6 +148,9 @@
     </ClCompile>
     <ClCompile Include="Value.cpp">
       <Filter>Source Files\Tree Item Defs</Filter>
+    </ClCompile>
+    <ClCompile Include="ReportTypeIconProperty.cpp">
+      <Filter>Source Files\Tree Item Defs\Properties</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

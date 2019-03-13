@@ -46,12 +46,18 @@ namespace HIDScout
     runtimeclass ReportType : ITreeItemType, Windows.UI.Xaml.Data.ICustomPropertyProvider
     {
         String TypeName{ get; };
+        String TypeIcon{ get; };
     };
 
     runtimeclass ReportTypeNameProperty : Windows.UI.Xaml.Data.ICustomProperty
     {
         ReportTypeNameProperty();
     };
+
+    runtimeclass ReportTypeIconProperty : Windows.UI.Xaml.Data.ICustomProperty
+    {
+        ReportTypeIconProperty();
+    }
 
     runtimeclass Report : ITreeItemType, Windows.UI.Xaml.Data.ICustomPropertyProvider
     {

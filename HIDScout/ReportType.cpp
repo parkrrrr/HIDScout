@@ -8,6 +8,11 @@ namespace winrt::HIDScout::implementation
         DebugBreak(); throw hresult_not_implemented();
     }
 
+    hstring ReportType::TypeIcon()
+    {
+        DebugBreak(); throw hresult_not_implemented();
+    }
+
     HIDScout::EntryType ReportType::TIType()
     {
         DebugBreak(); throw hresult_not_implemented();
